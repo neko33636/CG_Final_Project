@@ -14,21 +14,12 @@ public class GraphicConveyor {
         return result;
     }
 
-    public static Matrix4f scale(float scale) {
-        return scale(scale, scale, scale);
-    }
-
-
     public static Matrix4f translate(float tx, float ty, float tz) {
         Matrix4f result = Matrix4f.identity();
         result.set(0, 3, tx);
         result.set(1, 3, ty);
         result.set(2, 3, tz);
         return result;
-    }
-
-    public static Matrix4f translate(Vector3f translation) {
-        return translate(translation.getX(), translation.getY(), translation.getZ());
     }
 
 
@@ -69,39 +60,6 @@ public class GraphicConveyor {
         result.set(1, 1, cos);
 
         return result;
-    }
-
-    public static Matrix4f rotate(float angle, Vector3f axis) {
-        axis = axis.normalized();
-        float x = axis.getX();
-        float y = axis.getY();
-        float z = axis.getZ();
-
-        float cos = (float) Math.cos(angle);
-        float sin = (float) Math.sin(angle);
-        float oneMinusCos = 1 - cos;
-
-        Matrix4f result = Matrix4f.identity();
-
-        result.set(0, 0, cos + x*x*oneMinusCos);
-        result.set(0, 1, x*y*oneMinusCos - z*sin);
-        result.set(0, 2, x*z*oneMinusCos + y*sin);
-
-        result.set(1, 0, y*x*oneMinusCos + z*sin);
-        result.set(1, 1, cos + y*y*oneMinusCos);
-        result.set(1, 2, y*z*oneMinusCos - x*sin);
-
-        result.set(2, 0, z*x*oneMinusCos - y*sin);
-        result.set(2, 1, z*y*oneMinusCos + x*sin);
-        result.set(2, 2, cos + z*z*oneMinusCos);
-
-        return result;
-    }
-
-
-
-    public static Matrix4f rotateScaleTranslate() {
-        return Matrix4f.identity();
     }
 
     public static Matrix4f lookAt(Vector3f eye, Vector3f target) {
@@ -187,4 +145,22 @@ public class GraphicConveyor {
         float screenY = vertex.getY() * height + height / 2.0F;
         return new Vector2f(screenX, screenY);
     }
+
+    public static Matrix4f createModelMatrix(Vector3f translation, Vector3f rotation, Vector3f scale) {
+        //отдельные матрицы преобразований
+        Matrix4f scaleMatrix = scale(scale.getX(), scale.getY(), scale.getZ());
+        Matrix4f rotationXMatrix = rotateX(rotation.getX());
+        Matrix4f rotationYMatrix = rotateY(rotation.getY());
+        Matrix4f rotationZMatrix = rotateZ(rotation.getZ());
+        Matrix4f translationMatrix = translate(translation.getX(), translation.getY(), translation.getZ());
+
+        Matrix4f rotationMatrix = rotationZMatrix.multiply(rotationYMatrix.multiply(rotationXMatrix));
+
+        // Для векторов-столбцов: M = T * R * S
+        // Сначала масштабирование, потом вращение, потом перенос
+        Matrix4f modelMatrix = translationMatrix.multiply(rotationMatrix.multiply(scaleMatrix));
+
+        return modelMatrix;
+    }
+
 }

@@ -1,10 +1,11 @@
 package com.cgvsu.render_engine;
 
-import javafx.scene.canvas.GraphicsContext;
-import com.cgvsu.model.Model;
 import com.cgvsu.math.Vector3f;
-import com.cgvsu.math.Vector2f;
 import com.cgvsu.math.Matrix4f;
+import com.cgvsu.math.Vector2f;
+import com.cgvsu.model.Model;
+
+import javafx.scene.canvas.GraphicsContext;
 import java.util.ArrayList;
 
 public class RenderEngine {
@@ -14,13 +15,20 @@ public class RenderEngine {
             final Camera camera,
             final Model mesh,
             final int width,
-            final int height)
-    {
-        Matrix4f modelMatrix = GraphicConveyor.rotateScaleTranslate();
+            final int height) {
+
+        // Получаем трансформации модели
+        Vector3f translation = mesh.getTransform().getTranslation();
+        Vector3f rotation = mesh.getTransform().getRotation(); // углы в радианах
+        Vector3f scale = mesh.getTransform().getScale();
+
+        // Создаем матрицу модели
+        Matrix4f modelMatrix = GraphicConveyor.createModelMatrix(translation, rotation, scale);
+
         Matrix4f viewMatrix = camera.getViewMatrix();
         Matrix4f projectionMatrix = camera.getProjectionMatrix();
 
-        // Умножаем матрицы: model * view * projection
+        // Для векторов-столбцов: MVP = P × V × M
         Matrix4f modelViewProjectionMatrix = projectionMatrix
                 .multiply(viewMatrix)
                 .multiply(modelMatrix);
