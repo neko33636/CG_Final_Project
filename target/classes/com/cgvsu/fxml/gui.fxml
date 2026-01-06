@@ -56,13 +56,11 @@
 
     <Canvas fx:id="canvas" width="1200" height="800" AnchorPane.topAnchor="30.0" AnchorPane.leftAnchor="250.0"/>
 
-    <!-- Панель трансформаций модели -->
     <VBox spacing="10" AnchorPane.topAnchor="30.0" AnchorPane.leftAnchor="0.0"
           prefWidth="250" style="-fx-padding: 10; -fx-background-color: #f0f0f0;">
 
         <Label text="Model Transformations" style="-fx-font-weight: bold; -fx-font-size: 14;"/>
 
-        <!-- Перевод -->
         <Label text="Translation:" style="-fx-font-weight: bold;"/>
         <VBox spacing="5">
             <HBox spacing="5" alignment="CENTER_LEFT">
@@ -85,7 +83,6 @@
             </HBox>
         </VBox>
 
-        <!-- Вращение -->
         <Label text="Rotation (radians):" style="-fx-font-weight: bold;"/>
         <VBox spacing="5">
             <HBox spacing="5" alignment="CENTER_LEFT">
@@ -108,7 +105,6 @@
             </HBox>
         </VBox>
 
-        <!-- Масштабирование -->
         <Label text="Scale:" style="-fx-font-weight: bold;"/>
         <VBox spacing="5">
             <HBox spacing="5" alignment="CENTER_LEFT">
@@ -131,7 +127,6 @@
             </HBox>
         </VBox>
 
-        <!-- Кнопки управления -->
         <VBox spacing="5">
             <Button fx:id="resetTransformButton" text="Reset Transformations"
                     onAction="#onResetTransformButtonClick" prefWidth="200"/>

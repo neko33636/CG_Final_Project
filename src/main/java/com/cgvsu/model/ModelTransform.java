@@ -4,7 +4,7 @@ import com.cgvsu.math.Vector3f;
 
 public class ModelTransform {
     private Vector3f translation;
-    private Vector3f rotation; // В углах Эйлера (радианы)
+    private Vector3f rotation;
     private Vector3f scale;
 
     public ModelTransform() {
