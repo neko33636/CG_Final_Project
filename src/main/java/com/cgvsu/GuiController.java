@@ -25,8 +25,8 @@ import java.io.File;
 
 public class GuiController {
 
-    final private float TRANSLATION = 0.5F;
-    final private float STEP = 0.1F; // Шаг изменения параметров
+    final private float TRANSLATION = 2.5F;
+    final private float STEP = 0.5F;
 
     @FXML
     AnchorPane anchorPane;
@@ -34,7 +34,6 @@ public class GuiController {
     @FXML
     private Canvas canvas;
 
-    // UI элементы для трансформаций
     @FXML
     private Label translateXLabel;
     @FXML
@@ -59,7 +58,6 @@ public class GuiController {
     @FXML
     private Button resetTransformButton;
 
-    // Кнопки
     @FXML
     private Button translateXMinusBtn, translateXPlusBtn;
     @FXML
@@ -81,7 +79,6 @@ public class GuiController {
     @FXML
     private Button scaleZMinusBtn, scaleZPlusBtn;
 
-    // Текущие значения трансформаций
     private float translateX = 0.0f;
     private float translateY = 0.0f;
     private float translateZ = 0.0f;
@@ -99,7 +96,7 @@ public class GuiController {
     private Camera camera = new Camera(
             new Vector3f(0, 0, 100),
             new Vector3f(0, 0, 0),
-            1.0F, 1, 0.01F, 100);
+            1.0F, 1F, 0.01F, 100F);
 
     private Timeline timeline;
 

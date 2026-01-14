@@ -80,15 +80,15 @@ public class GraphicConveyor {
         Matrix4f rotationMatrix = Matrix4f.identity();
 
         rotationMatrix.set(0, 0, xa.getX());
-        rotationMatrix.set(1, 0, xa.getY());
-        rotationMatrix.set(2, 0, xa.getZ());
+        rotationMatrix.set(0, 1, xa.getY());
+        rotationMatrix.set(0, 2, xa.getZ());
 
-        rotationMatrix.set(0, 1, ya.getX());
+        rotationMatrix.set(1, 0, ya.getX());
         rotationMatrix.set(1, 1, ya.getY());
-        rotationMatrix.set(2, 1, ya.getZ());
+        rotationMatrix.set(1, 2, ya.getZ());
 
-        rotationMatrix.set(0, 2, za.getX());
-        rotationMatrix.set(1, 2, za.getY());
+        rotationMatrix.set(2, 0, za.getX());
+        rotationMatrix.set(2, 1, za.getY());
         rotationMatrix.set(2, 2, za.getZ());
 
         // Видовая матрица: V = P * T
@@ -103,17 +103,14 @@ public class GraphicConveyor {
 
         Matrix4f result = Matrix4f.zero();
 
-        float tanHalfFov = (float) Math.tan(fov * 0.5F);
-        float range = nearPlane - farPlane;
-
-
+        float tanHalfFov = (float) Math.tan(fov * 0.3F);
         float f = 1.0f / tanHalfFov;
 
-        result.set(0, 0, f / aspectRatio);
-        result.set(1, 1, f);
-        result.set(2, 2, (farPlane + nearPlane) / range);
-        result.set(2, 3, (2 * farPlane * nearPlane) / range);
-        result.set(3, 2, -1.0f);
+        result.set(0, 0, f);
+        result.set(1, 1, f / aspectRatio);
+        result.set(2, 2, (farPlane + nearPlane) / (farPlane - nearPlane));
+        result.set(2, 3, (2 * farPlane * nearPlane) / (nearPlane - farPlane));
+        result.set(3, 2, 1.0f);
 
         return result;
     }
@@ -141,8 +138,10 @@ public class GraphicConveyor {
     }
 
     public static Vector2f vertexToPoint(final Vector3f vertex, final int width, final int height) {
-        float screenX = vertex.getX() * width + width / 2.0F;
-        float screenY = vertex.getY() * height + height / 2.0F;
+
+        float screenX = ((width - 1) * 0.5f) * vertex.getX() + (width - 1) * 0.5f;
+        float screenY = ((1 - height) * 0.5f) * vertex.getY() + (height - 1) * 0.5f;
+
         return new Vector2f(screenX, screenY);
     }
 
@@ -154,7 +153,7 @@ public class GraphicConveyor {
         Matrix4f rotationZMatrix = rotateZ(rotation.getZ());
         Matrix4f translationMatrix = translate(translation.getX(), translation.getY(), translation.getZ());
 
-        Matrix4f rotationMatrix = rotationZMatrix.multiply(rotationYMatrix.multiply(rotationXMatrix));
+        Matrix4f rotationMatrix = rotationXMatrix.multiply(rotationYMatrix.multiply(rotationZMatrix));
 
         // Для векторов-столбцов: M = T * R * S
         // Сначала масштабирование, потом вращение, потом перенос

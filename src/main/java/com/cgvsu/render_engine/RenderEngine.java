@@ -19,7 +19,7 @@ public class RenderEngine {
 
         // Получаем трансформации модели
         Vector3f translation = mesh.getTransform().getTranslation();
-        Vector3f rotation = mesh.getTransform().getRotation(); // углы в радианах
+        Vector3f rotation = mesh.getTransform().getRotation();
         Vector3f scale = mesh.getTransform().getScale();
 
         // Создаем матрицу модели
@@ -29,9 +29,7 @@ public class RenderEngine {
         Matrix4f projectionMatrix = camera.getProjectionMatrix();
 
         // Для векторов-столбцов: MVP = P × V × M
-        Matrix4f modelViewProjectionMatrix = projectionMatrix
-                .multiply(viewMatrix)
-                .multiply(modelMatrix);
+        Matrix4f modelViewProjectionMatrix = projectionMatrix.multiply(viewMatrix).multiply(modelMatrix);
 
         final int nPolygons = mesh.polygons.size();
         for (int polygonInd = 0; polygonInd < nPolygons; ++polygonInd) {
