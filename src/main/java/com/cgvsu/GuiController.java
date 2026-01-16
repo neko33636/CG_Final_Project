@@ -31,10 +31,10 @@ public class GuiController {
 
     @FXML private AnchorPane anchorPane;
     @FXML private Canvas canvas;
-    @FXML private TextField txField, tyField, tzField, rxField, ryField, rzField, sxField, syField, szField;
-    @FXML private Button translateXMinusBtn, translateXPlusBtn, translateYMinusBtn, translateYPlusBtn, translateZMinusBtn, translateZPlusBtn;
-    @FXML private Button rotateXMinusBtn, rotateXPlusBtn, rotateYMinusBtn, rotateYPlusBtn, rotateZMinusBtn, rotateZPlusBtn;
-    @FXML private Button scaleXMinusBtn, scaleXPlusBtn, scaleYMinusBtn, scaleYPlusBtn, scaleZMinusBtn, scaleZPlusBtn;
+    @FXML private TextField txField, tyField, tzField;
+    @FXML private TextField rxField, ryField, rzField;
+    @FXML private TextField sxField, syField, szField;
+    @FXML private Button applyTranslationBtn, applyRotationBtn, applyScaleBtn;
     @FXML private Button resetTransformButton, resetAllTransformsButton, saveModelButton;
     @FXML private TextField vertexIndicesField, polygonIndicesField;
     @FXML private Button deleteVertexBtn, deletePolygonBtn;
@@ -46,18 +46,16 @@ public class GuiController {
     private final ToggleGroup activeModelGroup = new ToggleGroup();
     private int activeModelIndex = -1;
     private final Camera camera = new Camera(new Vector3f(0,0,100), new Vector3f(0,0,0), 1,1,0.01f,1000);
-    private final float STEP = 0.5f;
-    private final float CAMERA_STEP = 2.5f;
 
     public void setScene(Scene scene) {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             switch (e.getCode()) {
-                case UP -> camera.movePosition(new Vector3f(0, 0, -CAMERA_STEP));
-                case DOWN -> camera.movePosition(new Vector3f(0, 0, CAMERA_STEP));
-                case LEFT -> camera.movePosition(new Vector3f(CAMERA_STEP, 0, 0));
-                case RIGHT -> camera.movePosition(new Vector3f(-CAMERA_STEP, 0, 0));
-                case W -> camera.movePosition(new Vector3f(0, CAMERA_STEP, 0));
-                case S -> camera.movePosition(new Vector3f(0, -CAMERA_STEP, 0));
+                case UP -> camera.movePosition(new Vector3f(0, 0, -2.5f));
+                case DOWN -> camera.movePosition(new Vector3f(0, 0, 2.5f));
+                case LEFT -> camera.movePosition(new Vector3f(2.5f, 0, 0));
+                case RIGHT -> camera.movePosition(new Vector3f(-2.5f, 0, 0));
+                case W -> camera.movePosition(new Vector3f(0, 2.5f, 0));
+                case S -> camera.movePosition(new Vector3f(0, -2.5f, 0));
                 default -> { return; }
             }
             canvas.requestFocus();
@@ -68,12 +66,8 @@ public class GuiController {
     @FXML
     private void initialize() {
         canvas.setFocusTraversable(true);
-
         anchorPane.widthProperty().addListener((a,b,c)->canvas.setWidth(c.doubleValue()-260));
         anchorPane.heightProperty().addListener((a,b,c)->canvas.setHeight(c.doubleValue()-30));
-
-        Arrays.asList(txField, tyField, tzField, rxField, ryField, rzField, sxField, syField, szField)
-                .forEach(f -> f.textProperty().addListener((o, ov, nv) -> applyFromFields()));
 
         setTransformControls(false);
 
@@ -111,12 +105,12 @@ public class GuiController {
             rb.setSelected(true);
             rb.setOnAction(e -> {
                 activeModelIndex = index;
-                loadActiveModelTransform();
+                loadActiveModelToFields();
             });
 
             modelListVBox.getChildren().add(new HBox(5, rb, cb));
             activeModelIndex = index;
-            loadActiveModelTransform();
+            loadActiveModelToFields();
             setTransformControls(true);
             canvas.requestFocus();
 
@@ -129,108 +123,93 @@ public class GuiController {
         }
     }
 
-    private void applyFromFields() {
+    @FXML private void onApplyTranslation() {
+        Model m = getActiveModel();
+        if(m == null) return;
+        try {
+            m.getTransform().getTranslation().setX(Float.parseFloat(txField.getText()));
+            m.getTransform().getTranslation().setY(Float.parseFloat(tyField.getText()));
+            m.getTransform().getTranslation().setZ(Float.parseFloat(tzField.getText()));
+        } catch(NumberFormatException ignored){}
+    }
+
+    @FXML private void onApplyRotation() {
+        Model m = getActiveModel();
+        if(m == null) return;
+        try {
+            m.getTransform().getRotation().setX(Float.parseFloat(rxField.getText()));
+            m.getTransform().getRotation().setY(Float.parseFloat(ryField.getText()));
+            m.getTransform().getRotation().setZ(Float.parseFloat(rzField.getText()));
+        } catch(NumberFormatException ignored){}
+    }
+
+    @FXML private void onApplyScale() {
+        Model m = getActiveModel();
+        if(m == null) return;
+        try {
+            m.getTransform().getScale().setX(Float.parseFloat(sxField.getText()));
+            m.getTransform().getScale().setY(Float.parseFloat(syField.getText()));
+            m.getTransform().getScale().setZ(Float.parseFloat(szField.getText()));
+        } catch(NumberFormatException ignored){}
+    }
+
+    private void loadActiveModelToFields() {
         Model m = getActiveModel();
         if (m == null) return;
-        try {
-            m.getTransform().setTranslation(new Vector3f(Float.parseFloat(txField.getText()),
-                    Float.parseFloat(tyField.getText()),
-                    Float.parseFloat(tzField.getText())));
-            m.getTransform().setRotation(new Vector3f(Float.parseFloat(rxField.getText()),
-                    Float.parseFloat(ryField.getText()),
-                    Float.parseFloat(rzField.getText())));
-            m.getTransform().setScale(new Vector3f(Float.parseFloat(sxField.getText()),
-                    Float.parseFloat(syField.getText()),
-                    Float.parseFloat(szField.getText())));
-        } catch(NumberFormatException ignored){}
+
+        txField.setText(String.valueOf(m.getTransform().getTranslation().getX()));
+        tyField.setText(String.valueOf(m.getTransform().getTranslation().getY()));
+        tzField.setText(String.valueOf(m.getTransform().getTranslation().getZ()));
+
+        rxField.setText(String.valueOf(m.getTransform().getRotation().getX()));
+        ryField.setText(String.valueOf(m.getTransform().getRotation().getY()));
+        rzField.setText(String.valueOf(m.getTransform().getRotation().getZ()));
+
+        sxField.setText(String.valueOf(m.getTransform().getScale().getX()));
+        syField.setText(String.valueOf(m.getTransform().getScale().getY()));
+        szField.setText(String.valueOf(m.getTransform().getScale().getZ()));
     }
 
     private Model getActiveModel() {
         return (activeModelIndex>=0 && activeModelIndex<models.size()) ? models.get(activeModelIndex) : null;
     }
 
-    private void loadActiveModelTransform() {
-        Model m = getActiveModel();
-        if(m==null) return;
-        txField.setText(String.valueOf(m.getTransform().getTranslation().getX()));
-        tyField.setText(String.valueOf(m.getTransform().getTranslation().getY()));
-        tzField.setText(String.valueOf(m.getTransform().getTranslation().getZ()));
-        rxField.setText(String.valueOf(m.getTransform().getRotation().getX()));
-        ryField.setText(String.valueOf(m.getTransform().getRotation().getY()));
-        rzField.setText(String.valueOf(m.getTransform().getRotation().getZ()));
-        sxField.setText(String.valueOf(m.getTransform().getScale().getX()));
-        syField.setText(String.valueOf(m.getTransform().getScale().getY()));
-        szField.setText(String.valueOf(m.getTransform().getScale().getZ()));
-    }
-
     private void setTransformControls(boolean v) {
         Arrays.asList(
-                translateXMinusBtn, translateXPlusBtn, translateYMinusBtn, translateYPlusBtn,
-                translateZMinusBtn, translateZPlusBtn,
-                rotateXMinusBtn, rotateXPlusBtn, rotateYMinusBtn, rotateYPlusBtn,
-                rotateZMinusBtn, rotateZPlusBtn,
-                scaleXMinusBtn, scaleXPlusBtn, scaleYMinusBtn, scaleYPlusBtn,
-                scaleZMinusBtn, scaleZPlusBtn,
+                applyTranslationBtn, applyRotationBtn, applyScaleBtn,
                 resetTransformButton, resetAllTransformsButton,
                 deleteVertexBtn, deletePolygonBtn, saveModelButton
         ).forEach(b -> b.setDisable(!v));
     }
 
-    @FXML private void onTranslateXMinus() { modifyActive("tx",-STEP); }
-    @FXML private void onTranslateXPlus() { modifyActive("tx",STEP); }
-    @FXML private void onTranslateYMinus() { modifyActive("ty",-STEP); }
-    @FXML private void onTranslateYPlus() { modifyActive("ty",STEP); }
-    @FXML private void onTranslateZMinus() { modifyActive("tz",-STEP); }
-    @FXML private void onTranslateZPlus() { modifyActive("tz",STEP); }
-    @FXML private void onRotateXMinus() { modifyActive("rx",-STEP); }
-    @FXML private void onRotateXPlus() { modifyActive("rx",STEP); }
-    @FXML private void onRotateYMinus() { modifyActive("ry",-STEP); }
-    @FXML private void onRotateYPlus() { modifyActive("ry",STEP); }
-    @FXML private void onRotateZMinus() { modifyActive("rz",-STEP); }
-    @FXML private void onRotateZPlus() { modifyActive("rz",STEP); }
-    @FXML private void onScaleXMinus() { modifyActive("sx",-STEP); }
-    @FXML private void onScaleXPlus() { modifyActive("sx",STEP); }
-    @FXML private void onScaleYMinus() { modifyActive("sy",-STEP); }
-    @FXML private void onScaleYPlus() { modifyActive("sy",STEP); }
-    @FXML private void onScaleZMinus() { modifyActive("sz",-STEP); }
-    @FXML private void onScaleZPlus() { modifyActive("sz",STEP); }
-
-    private void modifyActive(String type, float delta) {
-        Model m = getActiveModel();
-        if(m==null) return;
-        Vector3f t = m.getTransform().getTranslation();
-        Vector3f r = m.getTransform().getRotation();
-        Vector3f s = m.getTransform().getScale();
-        switch(type) {
-            case "tx" -> t.setX(t.getX()+delta);
-            case "ty" -> t.setY(t.getY()+delta);
-            case "tz" -> t.setZ(t.getZ()+delta);
-            case "rx" -> r.setX(r.getX()+delta);
-            case "ry" -> r.setY(r.getY()+delta);
-            case "rz" -> r.setZ(r.getZ()+delta);
-            case "sx" -> s.setX(Math.max(0.1f,s.getX()+delta));
-            case "sy" -> s.setY(Math.max(0.1f,s.getY()+delta));
-            case "sz" -> s.setZ(Math.max(0.1f,s.getZ()+delta));
-        }
-        loadActiveModelTransform();
-    }
-
     @FXML private void onResetTransformButtonClick() {
         Model m = getActiveModel();
         if(m==null) return;
-        m.getTransform().setTranslation(new Vector3f(0,0,0));
-        m.getTransform().setRotation(new Vector3f(0,0,0));
-        m.getTransform().setScale(new Vector3f(1,1,1));
-        loadActiveModelTransform();
+        m.getTransform().getTranslation().setX(0);
+        m.getTransform().getTranslation().setY(0);
+        m.getTransform().getTranslation().setZ(0);
+        m.getTransform().getRotation().setX(0);
+        m.getTransform().getRotation().setY(0);
+        m.getTransform().getRotation().setZ(0);
+        m.getTransform().getScale().setX(1);
+        m.getTransform().getScale().setY(1);
+        m.getTransform().getScale().setZ(1);
+        loadActiveModelToFields();
     }
 
     @FXML private void onResetAllTransformsButtonClick() {
         for(Model m: models) {
-            m.getTransform().setTranslation(new Vector3f(0,0,0));
-            m.getTransform().setRotation(new Vector3f(0,0,0));
-            m.getTransform().setScale(new Vector3f(1,1,1));
+            m.getTransform().getTranslation().setX(0);
+            m.getTransform().getTranslation().setY(0);
+            m.getTransform().getTranslation().setZ(0);
+            m.getTransform().getRotation().setX(0);
+            m.getTransform().getRotation().setY(0);
+            m.getTransform().getRotation().setZ(0);
+            m.getTransform().getScale().setX(1);
+            m.getTransform().getScale().setY(1);
+            m.getTransform().getScale().setZ(1);
         }
-        loadActiveModelTransform();
+        loadActiveModelToFields();
     }
 
     @FXML private void onDeleteVertices() {

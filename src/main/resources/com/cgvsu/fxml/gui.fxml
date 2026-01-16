@@ -15,12 +15,12 @@
 
     <Canvas fx:id="canvas"
             AnchorPane.topAnchor="30"
-            AnchorPane.leftAnchor="260"
+            AnchorPane.leftAnchor="300"
             AnchorPane.rightAnchor="0"
             AnchorPane.bottomAnchor="0"/>
 
     <VBox spacing="8"
-          prefWidth="260"
+          prefWidth="300"
           AnchorPane.topAnchor="30"
           AnchorPane.leftAnchor="0"
           AnchorPane.bottomAnchor="0"
@@ -30,19 +30,37 @@
         <VBox fx:id="modelListVBox" spacing="5"/>
 
         <Label text="Translation"/>
-        <HBox spacing="5"><Label text="X"/><Button fx:id="translateXMinusBtn" text="-" onAction="#onTranslateXMinus"/><TextField fx:id="txField"/><Button fx:id="translateXPlusBtn" text="+" onAction="#onTranslateXPlus"/></HBox>
-        <HBox spacing="5"><Label text="Y"/><Button fx:id="translateYMinusBtn" text="-" onAction="#onTranslateYMinus"/><TextField fx:id="tyField"/><Button fx:id="translateYPlusBtn" text="+" onAction="#onTranslateYPlus"/></HBox>
-        <HBox spacing="5"><Label text="Z"/><Button fx:id="translateZMinusBtn" text="-" onAction="#onTranslateZMinus"/><TextField fx:id="tzField"/><Button fx:id="translateZPlusBtn" text="+" onAction="#onTranslateZPlus"/></HBox>
+        <HBox spacing="5">
+            <Label text="X"/>
+            <TextField fx:id="txField"/>
+            <Label text="Y"/>
+            <TextField fx:id="tyField"/>
+            <Label text="Z"/>
+            <TextField fx:id="tzField"/>
+        </HBox>
+        <Button fx:id="applyTranslationBtn" text="Apply Translation" onAction="#onApplyTranslation"/>
 
         <Label text="Rotation"/>
-        <HBox spacing="5"><Label text="X"/><Button fx:id="rotateXMinusBtn" text="-" onAction="#onRotateXMinus"/><TextField fx:id="rxField"/><Button fx:id="rotateXPlusBtn" text="+" onAction="#onRotateXPlus"/></HBox>
-        <HBox spacing="5"><Label text="Y"/><Button fx:id="rotateYMinusBtn" text="-" onAction="#onRotateYMinus"/><TextField fx:id="ryField"/><Button fx:id="rotateYPlusBtn" text="+" onAction="#onRotateYPlus"/></HBox>
-        <HBox spacing="5"><Label text="Z"/><Button fx:id="rotateZMinusBtn" text="-" onAction="#onRotateZMinus"/><TextField fx:id="rzField"/><Button fx:id="rotateZPlusBtn" text="+" onAction="#onRotateZPlus"/></HBox>
+        <HBox spacing="5">
+            <Label text="X"/>
+            <TextField fx:id="rxField"/>
+            <Label text="Y"/>
+            <TextField fx:id="ryField"/>
+            <Label text="Z"/>
+            <TextField fx:id="rzField"/>
+        </HBox>
+        <Button fx:id="applyRotationBtn" text="Apply Rotation" onAction="#onApplyRotation"/>
 
         <Label text="Scale"/>
-        <HBox spacing="5"><Label text="X"/><Button fx:id="scaleXMinusBtn" text="-" onAction="#onScaleXMinus"/><TextField fx:id="sxField"/><Button fx:id="scaleXPlusBtn" text="+" onAction="#onScaleXPlus"/></HBox>
-        <HBox spacing="5"><Label text="Y"/><Button fx:id="scaleYMinusBtn" text="-" onAction="#onScaleYMinus"/><TextField fx:id="syField"/><Button fx:id="scaleYPlusBtn" text="+" onAction="#onScaleYPlus"/></HBox>
-        <HBox spacing="5"><Label text="Z"/><Button fx:id="scaleZMinusBtn" text="-" onAction="#onScaleZMinus"/><TextField fx:id="szField"/><Button fx:id="scaleZPlusBtn" text="+" onAction="#onScaleZPlus"/></HBox>
+        <HBox spacing="5">
+            <Label text="X"/>
+            <TextField fx:id="sxField"/>
+            <Label text="Y"/>
+            <TextField fx:id="syField"/>
+            <Label text="Z"/>
+            <TextField fx:id="szField"/>
+        </HBox>
+        <Button fx:id="applyScaleBtn" text="Apply Scale" onAction="#onApplyScale"/>
 
         <HBox spacing="5">
             <Button fx:id="resetTransformButton" text="Reset Active" onAction="#onResetTransformButtonClick"/>
