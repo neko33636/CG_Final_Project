@@ -1,135 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.input.KeyCodeCombination?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.canvas.Canvas?>
 
-<AnchorPane fx:id="anchorPane" xmlns:fx="http://javafx.com/fxml" fx:controller="com.cgvsu.GuiController">
+<AnchorPane fx:id="anchorPane"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.cgvsu.GuiController">
+
     <MenuBar>
-        <Menu mnemonicParsing="false" text="File">
-            <MenuItem mnemonicParsing="false" onAction="#onOpenModelMenuItemClick" text="Load Model">
-                <accelerator>
-                    <KeyCodeCombination alt="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP" code="O"/>
-                </accelerator>
-            </MenuItem>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Camera Options">
-            <MenuItem mnemonicParsing="false" onAction="#handleCameraForward" text="Forward">
-                <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="UP"/>
-                </accelerator>
-            </MenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#handleCameraBackward" text="Backward">
-                <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="DOWN"/>
-                </accelerator>
-            </MenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#handleCameraLeft" text="Left">
-                <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="LEFT"/>
-                </accelerator>
-            </MenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#handleCameraRight" text="Right">
-                <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="RIGHT"/>
-                </accelerator>
-            </MenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#handleCameraUp" text="Up">
-                <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="W"/>
-                </accelerator>
-            </MenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#handleCameraDown" text="Down">
-                <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="S"/>
-                </accelerator>
-            </MenuItem>
+        <Menu text="File">
+            <MenuItem text="Load Model" onAction="#onOpenModelMenuItemClick"/>
         </Menu>
     </MenuBar>
 
-    <Canvas fx:id="canvas" width="1200" height="800" AnchorPane.topAnchor="30.0" AnchorPane.leftAnchor="250.0"/>
+    <Canvas fx:id="canvas"
+            AnchorPane.topAnchor="30"
+            AnchorPane.leftAnchor="260"
+            AnchorPane.rightAnchor="0"
+            AnchorPane.bottomAnchor="0"/>
 
-    <VBox spacing="10" AnchorPane.topAnchor="30.0" AnchorPane.leftAnchor="0.0"
-          prefWidth="250" style="-fx-padding: 10; -fx-background-color: #f0f0f0;">
+    <VBox spacing="8"
+          prefWidth="260"
+          AnchorPane.topAnchor="30"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.bottomAnchor="0"
+          style="-fx-padding:10; -fx-background-color:#f0f0f0;">
 
-        <Label text="Model Transformations" style="-fx-font-weight: bold; -fx-font-size: 14;"/>
+        <Label text="Models"/>
+        <VBox fx:id="modelListVBox" spacing="5"/>
 
-        <Label text="Translation:" style="-fx-font-weight: bold;"/>
-        <VBox spacing="5">
-            <HBox spacing="5" alignment="CENTER_LEFT">
-                <Label text="X:" prefWidth="30"/>
-                <Button fx:id="translateXMinusBtn" text="-" onAction="#onTranslateXMinus" prefWidth="30"/>
-                <Label fx:id="translateXLabel" text="0.00" prefWidth="50" style="-fx-alignment: center;"/>
-                <Button fx:id="translateXPlusBtn" text="+" onAction="#onTranslateXPlus" prefWidth="30"/>
-            </HBox>
-            <HBox spacing="5" alignment="CENTER_LEFT">
-                <Label text="Y:" prefWidth="30"/>
-                <Button fx:id="translateYMinusBtn" text="-" onAction="#onTranslateYMinus" prefWidth="30"/>
-                <Label fx:id="translateYLabel" text="0.00" prefWidth="50" style="-fx-alignment: center;"/>
-                <Button fx:id="translateYPlusBtn" text="+" onAction="#onTranslateYPlus" prefWidth="30"/>
-            </HBox>
-            <HBox spacing="5" alignment="CENTER_LEFT">
-                <Label text="Z:" prefWidth="30"/>
-                <Button fx:id="translateZMinusBtn" text="-" onAction="#onTranslateZMinus" prefWidth="30"/>
-                <Label fx:id="translateZLabel" text="0.00" prefWidth="50" style="-fx-alignment: center;"/>
-                <Button fx:id="translateZPlusBtn" text="+" onAction="#onTranslateZPlus" prefWidth="30"/>
-            </HBox>
-        </VBox>
+        <Label text="Translation"/>
+        <HBox spacing="5"><Label text="X"/><Button fx:id="translateXMinusBtn" text="-" onAction="#onTranslateXMinus"/><TextField fx:id="txField"/><Button fx:id="translateXPlusBtn" text="+" onAction="#onTranslateXPlus"/></HBox>
+        <HBox spacing="5"><Label text="Y"/><Button fx:id="translateYMinusBtn" text="-" onAction="#onTranslateYMinus"/><TextField fx:id="tyField"/><Button fx:id="translateYPlusBtn" text="+" onAction="#onTranslateYPlus"/></HBox>
+        <HBox spacing="5"><Label text="Z"/><Button fx:id="translateZMinusBtn" text="-" onAction="#onTranslateZMinus"/><TextField fx:id="tzField"/><Button fx:id="translateZPlusBtn" text="+" onAction="#onTranslateZPlus"/></HBox>
 
-        <Label text="Rotation (radians):" style="-fx-font-weight: bold;"/>
-        <VBox spacing="5">
-            <HBox spacing="5" alignment="CENTER_LEFT">
-                <Label text="X:" prefWidth="30"/>
-                <Button fx:id="rotateXMinusBtn" text="-" onAction="#onRotateXMinus" prefWidth="30"/>
-                <Label fx:id="rotateXLabel" text="0.00" prefWidth="50" style="-fx-alignment: center;"/>
-                <Button fx:id="rotateXPlusBtn" text="+" onAction="#onRotateXPlus" prefWidth="30"/>
-            </HBox>
-            <HBox spacing="5" alignment="CENTER_LEFT">
-                <Label text="Y:" prefWidth="30"/>
-                <Button fx:id="rotateYMinusBtn" text="-" onAction="#onRotateYMinus" prefWidth="30"/>
-                <Label fx:id="rotateYLabel" text="0.00" prefWidth="50" style="-fx-alignment: center;"/>
-                <Button fx:id="rotateYPlusBtn" text="+" onAction="#onRotateYPlus" prefWidth="30"/>
-            </HBox>
-            <HBox spacing="5" alignment="CENTER_LEFT">
-                <Label text="Z:" prefWidth="30"/>
-                <Button fx:id="rotateZMinusBtn" text="-" onAction="#onRotateZMinus" prefWidth="30"/>
-                <Label fx:id="rotateZLabel" text="0.00" prefWidth="50" style="-fx-alignment: center;"/>
-                <Button fx:id="rotateZPlusBtn" text="+" onAction="#onRotateZPlus" prefWidth="30"/>
-            </HBox>
-        </VBox>
+        <Label text="Rotation"/>
+        <HBox spacing="5"><Label text="X"/><Button fx:id="rotateXMinusBtn" text="-" onAction="#onRotateXMinus"/><TextField fx:id="rxField"/><Button fx:id="rotateXPlusBtn" text="+" onAction="#onRotateXPlus"/></HBox>
+        <HBox spacing="5"><Label text="Y"/><Button fx:id="rotateYMinusBtn" text="-" onAction="#onRotateYMinus"/><TextField fx:id="ryField"/><Button fx:id="rotateYPlusBtn" text="+" onAction="#onRotateYPlus"/></HBox>
+        <HBox spacing="5"><Label text="Z"/><Button fx:id="rotateZMinusBtn" text="-" onAction="#onRotateZMinus"/><TextField fx:id="rzField"/><Button fx:id="rotateZPlusBtn" text="+" onAction="#onRotateZPlus"/></HBox>
 
-        <Label text="Scale:" style="-fx-font-weight: bold;"/>
-        <VBox spacing="5">
-            <HBox spacing="5" alignment="CENTER_LEFT">
-                <Label text="X:" prefWidth="30"/>
-                <Button fx:id="scaleXMinusBtn" text="-" onAction="#onScaleXMinus" prefWidth="30"/>
-                <Label fx:id="scaleXLabel" text="1.00" prefWidth="50" style="-fx-alignment: center;"/>
-                <Button fx:id="scaleXPlusBtn" text="+" onAction="#onScaleXPlus" prefWidth="30"/>
-            </HBox>
-            <HBox spacing="5" alignment="CENTER_LEFT">
-                <Label text="Y:" prefWidth="30"/>
-                <Button fx:id="scaleYMinusBtn" text="-" onAction="#onScaleYMinus" prefWidth="30"/>
-                <Label fx:id="scaleYLabel" text="1.00" prefWidth="50" style="-fx-alignment: center;"/>
-                <Button fx:id="scaleYPlusBtn" text="+" onAction="#onScaleYPlus" prefWidth="30"/>
-            </HBox>
-            <HBox spacing="5" alignment="CENTER_LEFT">
-                <Label text="Z:" prefWidth="30"/>
-                <Button fx:id="scaleZMinusBtn" text="-" onAction="#onScaleZMinus" prefWidth="30"/>
-                <Label fx:id="scaleZLabel" text="1.00" prefWidth="50" style="-fx-alignment: center;"/>
-                <Button fx:id="scaleZPlusBtn" text="+" onAction="#onScaleZPlus" prefWidth="30"/>
-            </HBox>
-        </VBox>
+        <Label text="Scale"/>
+        <HBox spacing="5"><Label text="X"/><Button fx:id="scaleXMinusBtn" text="-" onAction="#onScaleXMinus"/><TextField fx:id="sxField"/><Button fx:id="scaleXPlusBtn" text="+" onAction="#onScaleXPlus"/></HBox>
+        <HBox spacing="5"><Label text="Y"/><Button fx:id="scaleYMinusBtn" text="-" onAction="#onScaleYMinus"/><TextField fx:id="syField"/><Button fx:id="scaleYPlusBtn" text="+" onAction="#onScaleYPlus"/></HBox>
+        <HBox spacing="5"><Label text="Z"/><Button fx:id="scaleZMinusBtn" text="-" onAction="#onScaleZMinus"/><TextField fx:id="szField"/><Button fx:id="scaleZPlusBtn" text="+" onAction="#onScaleZPlus"/></HBox>
 
-        <VBox spacing="5">
-            <Button fx:id="resetTransformButton" text="Reset Transformations"
-                    onAction="#onResetTransformButtonClick" prefWidth="200"/>
-        </VBox>
+        <HBox spacing="5">
+            <Button fx:id="resetTransformButton" text="Reset Active" onAction="#onResetTransformButtonClick"/>
+            <Button fx:id="resetAllTransformsButton" text="Reset All" onAction="#onResetAllTransformsButtonClick"/>
+            <Button fx:id="saveModelButton" text="Save Active Model" onAction="#onSaveModel"/>
+        </HBox>
+
+        <Separator/>
+
+        <Label text="Delete vertices"/>
+        <HBox spacing="5">
+            <TextField fx:id="vertexIndicesField"/>
+            <Button fx:id="deleteVertexBtn" text="Delete" onAction="#onDeleteVertices"/>
+        </HBox>
+
+        <Label text="Delete polygons"/>
+        <HBox spacing="5">
+            <TextField fx:id="polygonIndicesField"/>
+            <Button fx:id="deletePolygonBtn" text="Delete" onAction="#onDeletePolygons"/>
+        </HBox>
+
+        <CheckBox fx:id="deleteFreeVerticesCheckBox" text="Delete free vertices"/>
+
     </VBox>
 </AnchorPane>
