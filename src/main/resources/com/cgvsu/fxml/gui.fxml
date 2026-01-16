@@ -38,7 +38,6 @@
             <Label text="Z"/>
             <TextField fx:id="tzField"/>
         </HBox>
-        <Button fx:id="applyTranslationBtn" text="Apply Translation" onAction="#onApplyTranslation"/>
 
         <Label text="Rotation"/>
         <HBox spacing="5">
@@ -49,7 +48,6 @@
             <Label text="Z"/>
             <TextField fx:id="rzField"/>
         </HBox>
-        <Button fx:id="applyRotationBtn" text="Apply Rotation" onAction="#onApplyRotation"/>
 
         <Label text="Scale"/>
         <HBox spacing="5">
@@ -60,7 +58,6 @@
             <Label text="Z"/>
             <TextField fx:id="szField"/>
         </HBox>
-        <Button fx:id="applyScaleBtn" text="Apply Scale" onAction="#onApplyScale"/>
 
         <HBox spacing="5">
             <Button fx:id="resetTransformButton" text="Reset Active" onAction="#onResetTransformButtonClick"/>

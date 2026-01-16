@@ -34,7 +34,6 @@ public class GuiController {
     @FXML private TextField txField, tyField, tzField;
     @FXML private TextField rxField, ryField, rzField;
     @FXML private TextField sxField, syField, szField;
-    @FXML private Button applyTranslationBtn, applyRotationBtn, applyScaleBtn;
     @FXML private Button resetTransformButton, resetAllTransformsButton, saveModelButton;
     @FXML private TextField vertexIndicesField, polygonIndicesField;
     @FXML private Button deleteVertexBtn, deletePolygonBtn;
@@ -46,6 +45,7 @@ public class GuiController {
     private final ToggleGroup activeModelGroup = new ToggleGroup();
     private int activeModelIndex = -1;
     private final Camera camera = new Camera(new Vector3f(0,0,100), new Vector3f(0,0,0), 1,1,0.01f,1000);
+    private boolean isUpdatingFields = false;
 
     public void setScene(Scene scene) {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
@@ -70,7 +70,83 @@ public class GuiController {
         anchorPane.heightProperty().addListener((a,b,c)->canvas.setHeight(c.doubleValue()-30));
 
         setTransformControls(false);
+        txField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!isUpdatingFields && getActiveModel() != null && !newValue.isEmpty()) {
+                try {
+                    float value = Float.parseFloat(newValue);
+                    getActiveModel().getTransform().getTranslation().setX(value);
+                } catch (NumberFormatException ignored) {}
+            }
+        });
+        tyField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!isUpdatingFields && getActiveModel() != null && !newValue.isEmpty()) {
+                try {
+                    float value = Float.parseFloat(newValue);
+                    getActiveModel().getTransform().getTranslation().setY(value);
+                } catch (NumberFormatException ignored) {}
+            }
+        });
+        tzField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!isUpdatingFields && getActiveModel() != null && !newValue.isEmpty()) {
+                try {
+                    float value = Float.parseFloat(newValue);
+                    getActiveModel().getTransform().getTranslation().setZ(value);
+                } catch (NumberFormatException ignored) {}
+            }
+        });
 
+        rxField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!isUpdatingFields && getActiveModel() != null && !newValue.isEmpty()) {
+                try {
+                    float degrees = Float.parseFloat(newValue);
+                    float radians = (float) Math.toRadians(degrees);
+                    getActiveModel().getTransform().getRotation().setX(radians);
+                } catch (NumberFormatException ignored) {}
+            }
+        });
+        ryField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!isUpdatingFields && getActiveModel() != null && !newValue.isEmpty()) {
+                try {
+                    float degrees = Float.parseFloat(newValue);
+                    float radians = (float) Math.toRadians(degrees);
+                    getActiveModel().getTransform().getRotation().setY(radians);
+                } catch (NumberFormatException ignored) {}
+            }
+        });
+        rzField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!isUpdatingFields && getActiveModel() != null && !newValue.isEmpty()) {
+                try {
+                    float degrees = Float.parseFloat(newValue);
+                    float radians = (float) Math.toRadians(degrees);
+                    getActiveModel().getTransform().getRotation().setZ(radians);
+                } catch (NumberFormatException ignored) {}
+            }
+        });
+
+        sxField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!isUpdatingFields && getActiveModel() != null && !newValue.isEmpty()) {
+                try {
+                    float value = Float.parseFloat(newValue);
+                    getActiveModel().getTransform().getScale().setX(value);
+                } catch (NumberFormatException ignored) {}
+            }
+        });
+        syField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!isUpdatingFields && getActiveModel() != null && !newValue.isEmpty()) {
+                try {
+                    float value = Float.parseFloat(newValue);
+                    getActiveModel().getTransform().getScale().setY(value);
+                } catch (NumberFormatException ignored) {}
+            }
+        });
+        szField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!isUpdatingFields && getActiveModel() != null && !newValue.isEmpty()) {
+                try {
+                    float value = Float.parseFloat(newValue);
+                    getActiveModel().getTransform().getScale().setZ(value);
+                } catch (NumberFormatException ignored) {}
+            }
+        });
         Timeline t = new Timeline(new KeyFrame(Duration.millis(16), e -> {
             var g = canvas.getGraphicsContext2D();
             g.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
@@ -123,51 +199,26 @@ public class GuiController {
         }
     }
 
-    @FXML private void onApplyTranslation() {
-        Model m = getActiveModel();
-        if(m == null) return;
-        try {
-            m.getTransform().getTranslation().setX(Float.parseFloat(txField.getText()));
-            m.getTransform().getTranslation().setY(Float.parseFloat(tyField.getText()));
-            m.getTransform().getTranslation().setZ(Float.parseFloat(tzField.getText()));
-        } catch(NumberFormatException ignored){}
-    }
-
-    @FXML private void onApplyRotation() {
-        Model m = getActiveModel();
-        if(m == null) return;
-        try {
-            m.getTransform().getRotation().setX(Float.parseFloat(rxField.getText()));
-            m.getTransform().getRotation().setY(Float.parseFloat(ryField.getText()));
-            m.getTransform().getRotation().setZ(Float.parseFloat(rzField.getText()));
-        } catch(NumberFormatException ignored){}
-    }
-
-    @FXML private void onApplyScale() {
-        Model m = getActiveModel();
-        if(m == null) return;
-        try {
-            m.getTransform().getScale().setX(Float.parseFloat(sxField.getText()));
-            m.getTransform().getScale().setY(Float.parseFloat(syField.getText()));
-            m.getTransform().getScale().setZ(Float.parseFloat(szField.getText()));
-        } catch(NumberFormatException ignored){}
-    }
-
     private void loadActiveModelToFields() {
         Model m = getActiveModel();
         if (m == null) return;
 
-        txField.setText(String.valueOf(m.getTransform().getTranslation().getX()));
-        tyField.setText(String.valueOf(m.getTransform().getTranslation().getY()));
-        tzField.setText(String.valueOf(m.getTransform().getTranslation().getZ()));
+        isUpdatingFields = true;
+        try {
+            txField.setText(String.valueOf(m.getTransform().getTranslation().getX()));
+            tyField.setText(String.valueOf(m.getTransform().getTranslation().getY()));
+            tzField.setText(String.valueOf(m.getTransform().getTranslation().getZ()));
 
-        rxField.setText(String.valueOf(m.getTransform().getRotation().getX()));
-        ryField.setText(String.valueOf(m.getTransform().getRotation().getY()));
-        rzField.setText(String.valueOf(m.getTransform().getRotation().getZ()));
+            rxField.setText(String.valueOf(Math.toDegrees(m.getTransform().getRotation().getX())));
+            ryField.setText(String.valueOf(Math.toDegrees(m.getTransform().getRotation().getY())));
+            rzField.setText(String.valueOf(Math.toDegrees(m.getTransform().getRotation().getZ())));
 
-        sxField.setText(String.valueOf(m.getTransform().getScale().getX()));
-        syField.setText(String.valueOf(m.getTransform().getScale().getY()));
-        szField.setText(String.valueOf(m.getTransform().getScale().getZ()));
+            sxField.setText(String.valueOf(m.getTransform().getScale().getX()));
+            syField.setText(String.valueOf(m.getTransform().getScale().getY()));
+            szField.setText(String.valueOf(m.getTransform().getScale().getZ()));
+        } finally {
+            isUpdatingFields = false;
+        }
     }
 
     private Model getActiveModel() {
@@ -176,7 +227,6 @@ public class GuiController {
 
     private void setTransformControls(boolean v) {
         Arrays.asList(
-                applyTranslationBtn, applyRotationBtn, applyScaleBtn,
                 resetTransformButton, resetAllTransformsButton,
                 deleteVertexBtn, deletePolygonBtn, saveModelButton
         ).forEach(b -> b.setDisable(!v));
