@@ -98,7 +98,9 @@ public class Vector3f {
                 Math.abs(y - Vector3f.y) < 1e-10 &&
                 Math.abs(z - Vector3f.z) < 1e-10;
     }
-
+    public void setX(float x) { this.x = x; }
+    public void setY(float y) { this.y = y; }
+    public void setZ(float z) { this.z = z; }
     @Override
     public String toString() {
         return String.format("Vector3f(%.4f, %.4f, %.4f)", x, y, z);
