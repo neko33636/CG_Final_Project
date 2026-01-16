@@ -13,19 +13,15 @@ public class PolygonRemover {
             boolean deleteFreeVertices
     ) {
 
-        Set<Integer> allInitiallyUsedVertexes = new HashSet<>();
-        for (Polygon p : model.polygons) {
-            allInitiallyUsedVertexes.addAll(p.getVertexIndices());
-        }
-
-        Set<Integer> allInitiallyUsedTextureVertexes = new HashSet<>();
-        for (Polygon p : model.polygons) {
-            allInitiallyUsedTextureVertexes.addAll(p.getTextureVertexIndices());
-        }
-
+        Set<Integer> allInitiallyUsedVertices = new HashSet<>();
+        Set<Integer> allInitiallyUsedTextures = new HashSet<>();
         Set<Integer> allInitiallyUsedNormals = new HashSet<>();
         for (Polygon p : model.polygons) {
-            allInitiallyUsedNormals.addAll(p.getNormalIndices());
+            allInitiallyUsedVertices.addAll(p.getVertexIndices());
+            if (!p.getTextureVertexIndices().isEmpty())
+                allInitiallyUsedTextures.addAll(p.getTextureVertexIndices());
+            if (!p.getNormalIndices().isEmpty())
+                allInitiallyUsedNormals.addAll(p.getNormalIndices());
         }
 
         ArrayList<Polygon> newPolygons = new ArrayList<>();
@@ -38,50 +34,47 @@ public class PolygonRemover {
 
         if (!deleteFreeVertices) return;
 
-        Set<Integer> currentlyUsedVertices = new HashSet<>();
-        for (Polygon p : model.polygons) {
-            currentlyUsedVertices.addAll(p.getVertexIndices());
-        }
+        Set<Integer> usedVertices = new HashSet<>();
+        Set<Integer> usedTextures = new HashSet<>();
+        Set<Integer> usedNormals = new HashSet<>();
 
-        Set<Integer> currentlyUsedVerticesT = new HashSet<>();
         for (Polygon p : model.polygons) {
-            currentlyUsedVerticesT.addAll(p.getTextureVertexIndices());
-        }
-
-        Set<Integer> currentlyUsedNormal = new HashSet<>();
-        for (Polygon p : model.polygons) {
-            currentlyUsedNormal.addAll(p.getNormalIndices());
+            usedVertices.addAll(p.getVertexIndices());
+            if (!p.getTextureVertexIndices().isEmpty())
+                usedTextures.addAll(p.getTextureVertexIndices());
+            if (!p.getNormalIndices().isEmpty())
+                usedNormals.addAll(p.getNormalIndices());
         }
 
         Set<Integer> verticesToKeep = new HashSet<>();
         for (int i = 0; i < model.vertices.size(); i++) {
-            if (currentlyUsedVertices.contains(i) || !allInitiallyUsedVertexes.contains(i)) {
+            if (usedVertices.contains(i) || !allInitiallyUsedVertices.contains(i)) {
                 verticesToKeep.add(i);
             }
         }
 
-        Set<Integer> verticesTToKeep = new HashSet<>();
-        for (int i = 0; i < model.vertices.size(); i++) {
-            if (currentlyUsedVerticesT.contains(i) || !allInitiallyUsedTextureVertexes.contains(i)) {
-                verticesTToKeep.add(i);
+        Set<Integer> texturesToKeep = new HashSet<>();
+        for (int i = 0; i < model.textureVertices.size(); i++) {
+            if (usedTextures.contains(i) || !allInitiallyUsedTextures.contains(i)) {
+                texturesToKeep.add(i);
             }
         }
 
-        Set<Integer> normalToKeep = new HashSet<>();
-        for (int i = 0; i < model.vertices.size(); i++) {
-            if (currentlyUsedNormal.contains(i) || !allInitiallyUsedNormals.contains(i)) {
-                normalToKeep.add(i);
+        Set<Integer> normalsToKeep = new HashSet<>();
+        for (int i = 0; i < model.normals.size(); i++) {
+            if (usedNormals.contains(i) || !allInitiallyUsedNormals.contains(i)) {
+                normalsToKeep.add(i);
             }
         }
 
         Map<Integer, Integer> vMap = rebuildList(model.vertices, verticesToKeep);
-        Map<Integer, Integer> vtMap = rebuildList(model.textureVertices, verticesTToKeep);
-        Map<Integer, Integer> vnMap = rebuildList(model.normals, normalToKeep);
+        Map<Integer, Integer> tMap = rebuildList(model.textureVertices, texturesToKeep);
+        Map<Integer, Integer> nMap = rebuildList(model.normals, normalsToKeep);
 
         for (Polygon p : model.polygons) {
-            remapVertices(p.getVertexIndices(), vMap);
-            remapVertices(p.getTextureVertexIndices(), vtMap);
-            remapVertices(p.getNormalIndices(), vnMap);
+            remap(p.getVertexIndices(), vMap);
+            remap(p.getTextureVertexIndices(), tMap);
+            remap(p.getNormalIndices(), nMap);
         }
     }
 
@@ -103,12 +96,12 @@ public class PolygonRemover {
         return map;
     }
 
-    private static void remapVertices(ArrayList<Integer> indices, Map<Integer, Integer> map) {
-        if (indices.isEmpty()) return;
+    private static void remap(ArrayList<Integer> indices, Map<Integer, Integer> map) {
+        if (indices == null || indices.isEmpty()) return;
         for (int i = 0; i < indices.size(); i++) {
-            Integer newIndex = map.get(indices.get(i));
-            if (newIndex != null) {
-                indices.set(i, newIndex);
+            Integer ni = map.get(indices.get(i));
+            if (ni != null) {
+                indices.set(i, ni);
             }
         }
     }
