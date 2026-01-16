@@ -13,19 +13,30 @@ import java.util.Locale;
 public class ObjWriter {
 
     public static void saveModel(Model model, String filename) throws IOException {
-        if (model == null) {
-            throw new IOException("Invalid model provided!");
-        }
-
+        if (model == null) throw new IOException("Invalid model provided!");
+        Model copy = flattenModel(model);
         try (FileWriter fileWriter = new FileWriter(filename)) {
-            writeHeader(fileWriter, model);
-
-            writeVertices(fileWriter, model.vertices);
-            writeTextureCoordinates(fileWriter, model.textureVertices);
-            writeNormals(fileWriter, model.normals);
-
-            writePolygons(fileWriter, model);
+            writeHeader(fileWriter, copy);
+            writeVertices(fileWriter, copy.vertices);
+            writeTextureCoordinates(fileWriter, copy.textureVertices);
+            writeNormals(fileWriter, copy.normals);
+            writePolygons(fileWriter, copy);
         }
+    }
+
+    private static Model flattenModel(Model model) {
+        Model copy = new Model();
+        copy.vertices.addAll(model.vertices);
+        copy.textureVertices.addAll(model.textureVertices);
+        copy.normals.addAll(model.normals);
+        for (Polygon p : model.polygons) {
+            Polygon newP = new Polygon();
+            newP.getVertexIndices().addAll(p.getVertexIndices());
+            newP.getTextureVertexIndices().addAll(p.getTextureVertexIndices());
+            newP.getNormalIndices().addAll(p.getNormalIndices());
+            copy.polygons.add(newP);
+        }
+        return copy;
     }
 
     private static void writeHeader(FileWriter writer, Model model) throws IOException {
@@ -37,111 +48,39 @@ public class ObjWriter {
     }
 
     private static void writeVertices(FileWriter writer, ArrayList<Vector3f> vertices) throws IOException {
-        for (Vector3f v : vertices) {
-            writer.write(String.format(Locale.US, "v %.6f %.6f %.6f\n", v.getX(), v.getY(), v.getZ()));
-        }
+        for (Vector3f v : vertices) writer.write(String.format(Locale.US,"v %.6f %.6f %.6f\n",v.getX(),v.getY(),v.getZ()));
         if (!vertices.isEmpty()) writer.write("\n");
     }
 
     private static void writeTextureCoordinates(FileWriter writer, ArrayList<Vector2f> textures) throws IOException {
-        for (Vector2f uv : textures) {
-            writer.write(String.format(Locale.US, "vt %.6f %.6f\n", uv.getX(), uv.getY()));
-        }
+        for (Vector2f uv : textures) writer.write(String.format(Locale.US,"vt %.6f %.6f\n",uv.getX(),uv.getY()));
         if (!textures.isEmpty()) writer.write("\n");
     }
 
     private static void writeNormals(FileWriter writer, ArrayList<Vector3f> normals) throws IOException {
-        for (Vector3f n : normals) {
-            writer.write(String.format(Locale.US, "vn %.6f %.6f %.6f\n", n.getX(), n.getY(), n.getZ()));
-        }
+        for (Vector3f n : normals) writer.write(String.format(Locale.US,"vn %.6f %.6f %.6f\n",n.getX(),n.getY(),n.getZ()));
         if (!normals.isEmpty()) writer.write("\n");
     }
 
     private static void writePolygons(FileWriter writer, Model model) throws IOException {
-        for (int i = 0; i < model.polygons.size(); i++) {
-            Polygon polygon = model.polygons.get(i);
-
-            if (polygon == null) {
-                throw new IOException("Polygon " + i + " is invalid");
-            }
-
+        for (Polygon polygon : model.polygons) {
             ArrayList<Integer> vIndices = polygon.getVertexIndices();
             ArrayList<Integer> tIndices = polygon.getTextureVertexIndices();
             ArrayList<Integer> nIndices = polygon.getNormalIndices();
-
-            validatePolygon(i, vIndices, tIndices, nIndices,
-                    model.vertices.size(), model.textureVertices.size(), model.normals.size());
-
-            writer.write(constructPolygonString(vIndices, tIndices, nIndices) + "\n");
+            writer.write(constructPolygonString(vIndices,tIndices,nIndices)+"\n");
         }
     }
 
-    private static void validatePolygon(int polygonIndex,
-                                        ArrayList<Integer> vIndices,
-                                        ArrayList<Integer> tIndices,
-                                        ArrayList<Integer> nIndices,
-                                        int totalVertices, int totalTextures, int totalNormals) throws IOException {
-
-        if (vIndices == null || vIndices.isEmpty()) {
-            throw new IOException("Polygon " + polygonIndex + " has no vertices");
-        }
-
-        int vertexCount = vIndices.size();
-
-        if (tIndices != null && !tIndices.isEmpty() && tIndices.size() != vertexCount) {
-            throw new IOException("Polygon " + polygonIndex + ": UV count mismatch (" +
-                    tIndices.size() + " vs " + vertexCount + ")");
-        }
-
-        if (nIndices != null && !nIndices.isEmpty() && nIndices.size() != vertexCount) {
-            throw new IOException("Polygon " + polygonIndex + ": Normal count mismatch (" +
-                    nIndices.size() + " vs " + vertexCount + ")");
-        }
-
-
-        validateIndexRange(polygonIndex, vIndices, "vertex", totalVertices);
-        if (tIndices != null && !tIndices.isEmpty()) {
-            validateIndexRange(polygonIndex, tIndices, "texture", totalTextures);
-        }
-        if (nIndices != null && !nIndices.isEmpty()) {
-            validateIndexRange(polygonIndex, nIndices, "normal", totalNormals);
-        }
-    }
-
-    private static void validateIndexRange(int polygonIndex, ArrayList<Integer> indices,
-                                           String type, int maxValue) throws IOException {
-        for (int i = 0; i < indices.size(); i++) {
-            int idx = indices.get(i);
-            if (idx < 0 || idx >= maxValue) {
-                throw new IOException(String.format("Polygon %d, %s %d: index %d out of range [0, %d]",
-                        polygonIndex, type, i, idx, maxValue - 1));
-            }
-        }
-    }
-
-    private static String constructPolygonString(ArrayList<Integer> vIndices,
-                                                 ArrayList<Integer> tIndices,
-                                                 ArrayList<Integer> nIndices) {
-
+    private static String constructPolygonString(ArrayList<Integer> vIndices, ArrayList<Integer> tIndices, ArrayList<Integer> nIndices){
         StringBuilder polygonBuilder = new StringBuilder("f");
-
-        for (int i = 0; i < vIndices.size(); i++) {
-            polygonBuilder.append(" ");
-            polygonBuilder.append(vIndices.get(i) + 1);
-
-            boolean hasTex = tIndices != null && !tIndices.isEmpty() && i < tIndices.size();
-            boolean hasNorm = nIndices != null && !nIndices.isEmpty() && i < nIndices.size();
-
-            if (hasTex && hasNorm) {
-                polygonBuilder.append("/").append(tIndices.get(i) + 1)
-                        .append("/").append(nIndices.get(i) + 1);
-            } else if (hasTex) {
-                polygonBuilder.append("/").append(tIndices.get(i) + 1);
-            } else if (hasNorm) {
-                polygonBuilder.append("//").append(nIndices.get(i) + 1);
-            }
+        for(int i=0;i<vIndices.size();i++){
+            polygonBuilder.append(" ").append(vIndices.get(i)+1);
+            boolean hasTex = tIndices!=null && i<tIndices.size();
+            boolean hasNorm = nIndices!=null && i<nIndices.size();
+            if(hasTex && hasNorm) polygonBuilder.append("/").append(tIndices.get(i)+1).append("/").append(nIndices.get(i)+1);
+            else if(hasTex) polygonBuilder.append("/").append(tIndices.get(i)+1);
+            else if(hasNorm) polygonBuilder.append("//").append(nIndices.get(i)+1);
         }
-
         return polygonBuilder.toString();
     }
 }
